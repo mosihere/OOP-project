@@ -169,7 +169,6 @@ class StudentManager:
                 return f'National Code Does Not Exists: {id_}\n'
 
 
-
         elif edit_by == '2':
             system('clear')
 
@@ -265,7 +264,41 @@ class StudentManager:
             return 'Wrong Option, You have to Choose a Number between (1-2)!\n'
                     
             
-            
+    def remove_student(self, edit_by: str, id_: str):
+        """
+        Check if this student exists
+        if True, Then remove the student.
+        """
+
+        system('clear')
+        if edit_by == '1':
+
+            for index, element in enumerate(self.list_of_students):
+                if element[3] == id_:
+                    removed_data = self.list_of_students.pop(index)
+                    system('clear')
+                    return f'{removed_data[0]} Removed Successfully.\n'
+                
+                else:
+                    system('clear')
+                    return f'There is no records with this National code.\n'
+                
+
+        elif edit_by == '2':
+
+            for index, element in enumerate(self.list_of_students):
+                if element[4] == id_:
+                    removed_data = self.list_of_students.pop(index)
+                    system('clear')
+                    return f'{removed_data[0]} Removed Successfully.\n'
+                
+                else:
+                    system('clear')
+                    return f'There is no records with this Student Number.\n'
+                  
+        else:
+            system('clear')
+            return 'Wrong Option, you have to Choose between (1-2)!\n'
 
 
 
@@ -275,7 +308,7 @@ if __name__ == '__main__':
     mostafa = StudentManager()
     while True:
 
-        options = input('1-Add Student\n2-Show Student\n3-Edit Student\n4-Remove Student\n5-Search Student\n6-Find Best Student By Score\n6-Exit\n\nHow Can I Help You: ')
+        options = input('1-Add Student\n2-Show Student\n3-Edit Student\n4-Remove Student\n5-Search Student\n6-Find Best Student By Score\n7-Exit\n\nHow Can I Help You: ')
         system('clear')
 
         if options == '1':
@@ -290,7 +323,7 @@ if __name__ == '__main__':
             system('clear')
 
             while True:
-                edit_option = input('Want to find Student By National Code or Student Number (1-NationalCode, 2-StudentNumber): ')
+                edit_option = input('Select Student By:\n1-NationalCode\n2-StudentNumber\n\n')
 
                 if edit_option == '1':
                     student_id = input('Enter Student National Code: ')
@@ -305,6 +338,26 @@ if __name__ == '__main__':
 
             print(mostafa.edit_student(edit_option, student_id))
 
-        elif options == '5':
+        elif options == '4':
+
+            system('clear')
+            while True:
+                edit_option = input('Remove Student By:\n1-NationalCode\n2-StudentNumber\n\n')
+
+                if edit_option == '1':
+                    student_id = input('Enter Student National Code: ')
+                    break
+
+                elif edit_option == '2':
+                    student_id = input('Enter Student Number: ')
+                    break
+
+                else:
+                    print('Wrong Option, You have to Choose a Number between (1-2)!')
+
+            print(mostafa.remove_student(edit_option, student_id))
+
+
+        elif options == '7':
             print('Good Bye.')
             break
