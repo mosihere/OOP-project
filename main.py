@@ -79,12 +79,19 @@ class StudentManager:
             if element[index] == id_:
                 return True
             
-    def __printer(self, value: List):
-        print('***********************************************************************************************')
-        for record in value:
-            print(*record, sep='\t')
-        print('***********************************************************************************************')
-        return f'{len(value)} records found\n'            
+    def __printer(self, value: List, nested: bool = True):
+        if nested:
+            print('***********************************************************************************************')
+            for record in value:
+                print(*record, sep='\t')
+            print('***********************************************************************************************')
+            return f'{len(value)} records found\n'  
+                  
+        else:
+            print('***********************************************************************************************')
+            print(*value, sep='\t')
+            print('***********************************************************************************************')
+            return f'\n'
 
 
     def edit_student(self, edit_by: str, id_: str):
@@ -368,10 +375,46 @@ class StudentManager:
             return self.__printer(filtered_list)
 
 
+    def best_student(self, course: str):
+        system('clear')
+
+        if course == '1':
+            highest_score = 1.0
+            for student in self.list_of_students:
+                if float(student[6]) > highest_score:
+                    highest_score = float(student[6])
+                    sharpest_student = student
+                continue
+            print(f'{sharpest_student[0]} get highest Score in C#')
+            return self.__printer(sharpest_student, nested=False)
+
+        if course == '2':
+            highest_score = 1.0
+            for student in self.list_of_students:
+                if float(student[7]) > highest_score:
+                    highest_score = float(student[7])
+                    sharpest_student = student
+                continue
+
+            print(f'{sharpest_student[0]} get highest Score in Python')
+            return self.__printer(sharpest_student, nested=False)
+
+        if course == '3':
+            highest_score = 1.0
+            for student in self.list_of_students:
+                if float(student[8]) > highest_score:
+                    highest_score = float(student[8])
+                    sharpest_student = student
+                continue
+
+            print(f'{sharpest_student[0]} get highest Score in Java')
+            return self.__printer(sharpest_student, nested=False)
+    
+
 
 if __name__ == '__main__':
 
-    mostafa = StudentManager()
+    student_manager = StudentManager()
     while True:
 
         options = input('1-Add Student\n2-Show Student\n3-Edit Student\n4-Remove Student\n5-Search Student\n6-Find Best Student By Score\n7-Exit\n\nHow Can I Help You: ')
@@ -379,10 +422,10 @@ if __name__ == '__main__':
 
         if options == '1':
             system('clear')
-            print(mostafa.add_student())
+            print(student_manager.add_student())
 
         elif options == '2':
-            print(mostafa.show_student())
+            print(student_manager.show_student())
 
         elif options == '3':
 
@@ -402,7 +445,7 @@ if __name__ == '__main__':
                 else:
                     print('Wrong Option, You have to Choose a Number between (1-2)!')
 
-            print(mostafa.edit_student(edit_option, student_id))
+            print(student_manager.edit_student(edit_option, student_id))
 
         elif options == '4':
 
@@ -421,7 +464,7 @@ if __name__ == '__main__':
                 else:
                     print('Wrong Option, You have to Choose a Number between (1-2)!')
 
-            print(mostafa.remove_student(edit_option, student_id))
+            print(student_manager.remove_student(edit_option, student_id))
 
         elif options == '5':
 
@@ -459,13 +502,13 @@ if __name__ == '__main__':
                     student_id = input('Enter Student Last Name: ')
                     break
             
-            print(mostafa.search_student(search_option, student_id))
+            print(student_manager.search_student(search_option, student_id))
 
         elif options == '6':
             
             system('clear')
             while True:
-                filter_by = input('Filtering Student By:\n1-C# Score\n2-Python Score\n3-Java Score\n\nWhich one: ')
+                filter_by = input('Find Best Student By:\n1-C# Score\n2-Python Score\n3-Java Score\n\nWhich one: ')
 
                 if filter_by == '1':
                     print('Finding best student by C# Score')
@@ -479,7 +522,7 @@ if __name__ == '__main__':
                     print('Finding best student by Java Score')
                     break
             
-            print(mostafa.best_student(filter_by))
+            print(student_manager.best_student(filter_by))
 
         elif options == '7':
 
