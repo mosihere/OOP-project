@@ -2,6 +2,10 @@ from os import system
 from typing import List
 
 class StudentManager:
+    """
+    A class to instantiate as a Student Manager
+    """
+
     def __init__(self) -> None:
         pass
     
@@ -65,7 +69,7 @@ class StudentManager:
         Print Students information.
 
         Return:
-            None
+            Str: List of Students
         """
 
         system('clear')
@@ -75,11 +79,27 @@ class StudentManager:
 
 
     def __check_duplicate(self, id_, index):
+        """
+        Check if Value is Duplicate.
+
+        Return: Bool
+        """
+
         for element in self.list_of_students:
             if element[index] == id_:
                 return True
             
-    def __printer(self, value: List, nested: bool = True):
+    def __printer(self, value: List, nested: bool = True) -> str:
+        """
+        Takes a list as argument and unpack and pretify values.
+
+        Args:
+            value: List
+            nested: Bool
+        
+        Return: Str
+        """
+
         if nested:
             print('***********************************************************************************************')
             for record in value:
@@ -94,7 +114,18 @@ class StudentManager:
             return f'\n'
 
 
-    def edit_student(self, edit_by: str, id_: str):
+    def edit_student(self, edit_by: str, id_: str) -> str:
+        """
+        This method takes edit_by and id_ as argument
+        then edit the specific part.
+
+        Args:
+            edit_by: str (User Chosen Method)
+            id_: str (Could be National Code / Student Number)
+
+        Return: Str
+        """
+
         system('clear')
         if edit_by == '1':
             for element in self.list_of_students:
@@ -278,6 +309,10 @@ class StudentManager:
         """
         Check if this student exists
         if True, Then remove the student.
+
+        Args:
+            edit_by: str (User Chosen Method Number)
+            id_: str (Could be National Code / Student Number)
         """
 
         system('clear')
@@ -312,6 +347,15 @@ class StudentManager:
 
 
     def search_student(self, search_option: str, student_id: str):
+        """
+        Searching Student Based on Chosen Methdo and id.
+
+        Args:
+            search_option: str (User chosen Method)
+            student_id: str (Could be First_name, Last_name, National_code ...)
+
+        Return: Str
+        """
 
         system('clear')
 
@@ -376,6 +420,13 @@ class StudentManager:
 
 
     def best_student(self, course: str):
+        """
+        Find Best Student Based on Score in specific Course.
+        
+        Args:
+            course: str
+        """
+
         system('clear')
 
         if course == '1':
