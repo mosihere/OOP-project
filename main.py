@@ -1,5 +1,5 @@
 from os import system
-
+from typing import List
 
 class StudentManager:
     def __init__(self) -> None:
@@ -20,13 +20,13 @@ class StudentManager:
         self.student_info = list()
 
         self.national_code = input('Student National Code: ')
-        if self._check_duplicate(self.national_code, 3):
+        if self.__check_duplicate(self.national_code, 3):
             system('clear')
             return 'This National Code Already Exists.\n'
         
         self.student_number = input('Student Number: ')
         
-        if self._check_duplicate(self.student_number, 4):
+        if self.__check_duplicate(self.student_number, 4):
             system('clear')
             return 'This Student Number Already Exists.\n'
 
@@ -57,7 +57,6 @@ class StudentManager:
 
         self.list_of_students.append(self.student_info)
         system('clear')
-        print(self.list_of_students)
         return f'{self.first_name} Saved.\n'
     
 
@@ -69,20 +68,24 @@ class StudentManager:
             None
         """
 
+        system('clear')
         print('List of Students:')
 
-        print('***********************************************************************************************')
-        for student in self.list_of_students:
-            print(*student, sep='\t')      
-        print('***********************************************************************************************') 
-
-        return f'{len(self.list_of_students)} records found.'
+        return self.__printer(self.list_of_students)
 
 
-    def _check_duplicate(self, id_, index):
+    def __check_duplicate(self, id_, index):
         for element in self.list_of_students:
             if element[index] == id_:
                 return True
+            
+    def __printer(self, value: List):
+        print('***********************************************************************************************')
+        for record in value:
+            print(*record, sep='\t')
+        print('***********************************************************************************************')
+        return f'{len(value)} records found\n'            
+
 
     def edit_student(self, edit_by: str, id_: str):
         system('clear')
@@ -114,7 +117,7 @@ class StudentManager:
                         new_national_code = input('Enter New National Code: ')
                         system('clear')
 
-                        if self._check_duplicate(new_national_code, 3):
+                        if self.__check_duplicate(new_national_code, 3):
                             return 'National Code Already Exists.\n'
                         
                         element[3] = new_national_code
@@ -124,7 +127,7 @@ class StudentManager:
                     elif edit_choices == '5':
                         new_student_number = input('Enter New Student Number: ')
 
-                        if self._check_duplicate(new_student_number, 4):
+                        if self.__check_duplicate(new_student_number, 4):
                             return 'Student Number Already Exists.\n'
                         
                         element[4] = new_student_number
@@ -301,6 +304,69 @@ class StudentManager:
             return 'Wrong Option, you have to Choose between (1-2)!\n'
 
 
+    def search_student(self, search_option: str, student_id: str):
+
+        system('clear')
+
+        if search_option == '1':
+
+            filtered_list = list()
+
+            for name in self.list_of_students:
+                if name[0] == student_id:
+                    filtered_list.append(name)
+                continue
+
+            return self.__printer(filtered_list)
+
+
+        if search_option == '2':
+
+            filtered_list = list()
+
+            for name in self.list_of_students:
+                if name[1] == student_id:
+                    filtered_list.append(name)
+                continue
+
+            return self.__printer(filtered_list)
+        
+
+        if search_option == '3':
+
+            filtered_list = list()
+
+            for name in self.list_of_students:
+                if name[2] == student_id:
+                    filtered_list.append(name)
+                continue
+
+            return self.__printer(filtered_list)
+
+
+        if search_option == '4':
+
+            filtered_list = list()
+
+            for name in self.list_of_students:
+                if name[3] == student_id:
+                    filtered_list.append(name)
+                continue
+
+            return self.__printer(filtered_list)
+
+
+        if search_option == '5':
+
+            filtered_list = list()
+
+            for name in self.list_of_students:
+                if name[4] == student_id:
+                    filtered_list.append(name)
+                continue
+
+            return self.__printer(filtered_list)
+
 
 
 if __name__ == '__main__':
@@ -342,7 +408,7 @@ if __name__ == '__main__':
 
             system('clear')
             while True:
-                edit_option = input('Remove Student By:\n1-NationalCode\n2-StudentNumber\n\n')
+                edit_option = input('Remove Student By:\n1-National Code\n2-Student Number\n\nWhich One: ')
 
                 if edit_option == '1':
                     student_id = input('Enter Student National Code: ')
@@ -357,7 +423,66 @@ if __name__ == '__main__':
 
             print(mostafa.remove_student(edit_option, student_id))
 
+        elif options == '5':
+
+            system('clear')
+            while True:
+                search_option = input('Search Student By:\n1-First name:\n2-Last Name\n3-Gender\n4-National Code\n5-Student Number\n6-Exit\n\nWhich One: ')
+
+                if search_option == '1':
+                    print('++ Filter by First Name ++')
+                    student_id = input('Enter Student First Name: ')
+                    break
+
+                elif search_option == '2':
+                    print('++ Filter by Last Name ++')
+                    student_id = input('Enter Student Last Name: ')
+                    break
+
+                elif search_option == '3':
+                    print('++ Filter by Gender ++')
+                    student_id = input('Enter Gender (m/f): ')
+                    break
+
+                elif search_option == '4':
+                    print('++ Filter by National Code ++')
+                    student_id = input('Enter Student National Code: ')
+                    break
+
+                elif search_option == '5':
+                    print('++ Filter by Student Number ++')
+                    student_id = input('Enter Student Number: ')
+                    break
+
+                elif search_option == '6':
+                    print('Exit.')
+                    student_id = input('Enter Student Last Name: ')
+                    break
+            
+            print(mostafa.search_student(search_option, student_id))
+
+        elif options == '6':
+            
+            system('clear')
+            while True:
+                filter_by = input('Filtering Student By:\n1-C# Score\n2-Python Score\n3-Java Score\n\nWhich one: ')
+
+                if filter_by == '1':
+                    print('Finding best student by C# Score')
+                    break
+
+                elif filter_by == '2':
+                    print('Finding best student by Python Score')
+                    break
+
+                elif filter_by == '3':
+                    print('Finding best student by Java Score')
+                    break
+            
+            print(mostafa.best_student(filter_by))
 
         elif options == '7':
+
+            system('clear')
             print('Good Bye.')
             break
