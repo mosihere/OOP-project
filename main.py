@@ -466,17 +466,6 @@ class StudentManager:
 
             return 'You have to add student first!\n'
 
-            for student in self.list_of_students:
-                if float(student[6]) > highest_score:
-                    highest_score = float(student[6])
-                    sharpest_student = student
-                continue
-
-            if len(self.list_of_students) >= 1:
-                print(f'{sharpest_student[0]} get highest Score in C#')
-                return self.__printer(sharpest_student, nested=False)
-            
-            return 'You have to add Students First\n'
 
         if course == '2':
             highest_score = 1.0
@@ -506,12 +495,6 @@ class StudentManager:
                 return self.__printer(sharpest_student, nested=False)
             
             return 'You have to add student first!\n'
-            if len(self.list_of_students) >= 1:
-
-                print(f'{sharpest_student[0]} get highest Score in Python')
-                return self.__printer(sharpest_student, nested=False)
-            
-            return 'You have to add Students First\n'
 
         if course == '3':
             highest_score = 1.0
