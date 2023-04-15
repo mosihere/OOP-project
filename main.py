@@ -549,7 +549,6 @@ if __name__ == '__main__':
             system(clear_command)
 
             while True:
-                edit_option = input('Select Student By:\n1-NationalCode\n2-StudentNumber\n\nWhich One: ')
                 while True:
                     edit_option = input('Select Student By:\n1-NationalCode\n2-StudentNumber\n\nWhich one: ')
 
