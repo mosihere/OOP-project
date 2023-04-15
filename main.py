@@ -139,10 +139,6 @@ class StudentManager:
             for element in self.list_of_students:
 
 
-                 if element[3] == id_:
-                    system(clear_command)
-                    edit_choices = input('What Do you want to edit about this Student:\n1-First Name\n2-Last Name\n3-Gender\n4-National Code\n5-Student Number\n6-Birthdate\n7-C# Score\n8-Python Score\n9-Java Score\n10-JS Score\n11-PHP Score:\n\n')
-
                 if element[3] == id_:
                     system('clear')
                     edit_choices = input('What Do you want to edit about this Student:\n1-First Name\n2-Last Name\n3-Gender\n4-National Code\n5-Student Number\n6-Birthdate\n7-C# Score\n8-Python Score\n9-Java Score\n10-JS Score\n11-PHP Score:\n\nWhich one: ')
