@@ -130,9 +130,9 @@ class StudentManager:
         if edit_by == '1':
             for element in self.list_of_students:
 
-                 if element[3] == id_:
+                if element[3] == id_:
                     system('clear')
-                    edit_choices = input('What Do you want to edit about this Student:\n1-First Name\n2-Last Name\n3-Gender\n4-National Code\n5-Student Number\n6-Birthdate\n7-C# Score\n8-Python Score\n9-Java Score\n10-JS Score\n11-PHP Score:\n\n')
+                    edit_choices = input('What Do you want to edit about this Student:\n1-First Name\n2-Last Name\n3-Gender\n4-National Code\n5-Student Number\n6-Birthdate\n7-C# Score\n8-Python Score\n9-Java Score\n10-JS Score\n11-PHP Score:\n\nWhich one: ')
 
                     if edit_choices == '1':
                         element[0] = input('Enter New First Name: ')
@@ -256,7 +256,6 @@ class StudentManager:
                         element[4] = new_student_number
                         system('clear')
                         return 'National Code Changed.\n'
-                    
 
                     elif edit_choices == '6':
                         element[5] = input('Enter New BirthDate: ')
@@ -296,8 +295,8 @@ class StudentManager:
                         system('clear')
                         return 'You Must Choose an option between (1-12)!\n'
                     
-                else:
-                    return f'Student Number Does Not Exists: {id_}\n'
+            else:
+                return f'Student Number Does Not Exists: {id_}\n'
 
                     
         else:
@@ -324,9 +323,8 @@ class StudentManager:
                     system('clear')
                     return f'{removed_data[0]} Removed Successfully.\n'
                 
-                else:
-                    system('clear')
-                    return f'There is no records with this National code.\n'
+            system('clear')
+            return f'There is no records with this National code.\n'
                 
 
         elif edit_by == '2':
@@ -337,9 +335,8 @@ class StudentManager:
                     system('clear')
                     return f'{removed_data[0]} Removed Successfully.\n'
                 
-                else:
-                    system('clear')
-                    return f'There is no records with this Student Number.\n'
+            system('clear')
+            return f'There is no records with this Student Number.\n'
                   
         else:
             system('clear')
@@ -436,8 +433,12 @@ class StudentManager:
                     highest_score = float(student[6])
                     sharpest_student = student
                 continue
-            print(f'{sharpest_student[0]} get highest Score in C#')
-            return self.__printer(sharpest_student, nested=False)
+
+            if len(self.list_of_students) >= 1:
+                print(f'{sharpest_student[0]} get highest Score in C#')
+                return self.__printer(sharpest_student, nested=False)
+            
+            return 'You have to add Students First\n'
 
         if course == '2':
             highest_score = 1.0
@@ -447,8 +448,12 @@ class StudentManager:
                     sharpest_student = student
                 continue
 
-            print(f'{sharpest_student[0]} get highest Score in Python')
-            return self.__printer(sharpest_student, nested=False)
+            if len(self.list_of_students) >= 1:
+
+                print(f'{sharpest_student[0]} get highest Score in Python')
+                return self.__printer(sharpest_student, nested=False)
+            
+            return 'You have to add Students First\n'
 
         if course == '3':
             highest_score = 1.0
@@ -458,9 +463,12 @@ class StudentManager:
                     sharpest_student = student
                 continue
 
-            print(f'{sharpest_student[0]} get highest Score in Java')
-            return self.__printer(sharpest_student, nested=False)
+            if len(self.list_of_students) >= 1:
+
+                print(f'{sharpest_student[0]} get highest Score in Java')
+                return self.__printer(sharpest_student, nested=False)
     
+            return 'You have to add Students First\n'
 
 
 if __name__ == '__main__':
@@ -483,20 +491,30 @@ if __name__ == '__main__':
             system('clear')
 
             while True:
-                edit_option = input('Select Student By:\n1-NationalCode\n2-StudentNumber\n\n')
+                while True:
+                    edit_option = input('Select Student By:\n1-NationalCode\n2-StudentNumber\n\nWhich one: ')
 
-                if edit_option == '1':
-                    student_id = input('Enter Student National Code: ')
-                    break 
+                    if edit_option == '1':
+                        student_id = input('Enter Student National Code: ')
+                        break 
 
-                elif edit_option == '2':
-                    student_id = input('Enter Student Number: ')
+                    elif edit_option == '2':
+                        student_id = input('Enter Student Number: ')
+                        break
+
+                    else:
+                        system('clear')
+                        print('Wrong Option, You have to Choose a Number between (1-2)!\n')
+
+                print(student_manager.edit_student(edit_option, student_id))
+                ask_for_continue_editing = input('Wanna Continue Editing?\n(Yes/No): ')
+                print()
+                if ask_for_continue_editing.lower() == 'no':
+                    system('clear')
                     break
 
-                else:
-                    print('Wrong Option, You have to Choose a Number between (1-2)!')
+                system('clear')
 
-            print(student_manager.edit_student(edit_option, student_id))
 
         elif options == '4':
 
