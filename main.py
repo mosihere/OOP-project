@@ -1,13 +1,56 @@
-import sys
 from os import system
-from os import name as osname
+import mysql.connector
 from typing import List
+from os import name as osname
 
 
 if osname == 'posix':
     clear_command = 'clear'
 else:
     clear_command = 'cls'
+
+db = mysql.connector.connect(
+
+    host="localhost",
+    user="root",
+    password="Linken.m0s",
+    database="student"
+    )
+
+def create_record(student_info):
+
+
+    cursor = db.cursor()
+
+    sql = """INSERT INTO Students (
+    ID, FirstName, LastName, NationalCode,
+    BirthDate, Gender, Python, Csharp,
+    Js, Php, Java
+    )
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    """
+    val = [
+        (
+        student_info['student_number'],
+        student_info['first_name'],
+        student_info['last_name'],
+        student_info['national_code'],
+        student_info['birth_date'],
+        student_info['gender'],
+        student_info['python_score'],
+        student_info['csharp_score'],
+        student_info['java_script_score'],
+        student_info['java_score'],
+        student_info['php_score'],
+        )
+    ]
+
+    cursor.executemany(sql, val)
+    db.commit()
+
+    return f'{cursor.rowcount}, "was inserted."'
+
+
 
 class StudentManager:
     """
@@ -29,16 +72,16 @@ class StudentManager:
             str
         """
 
-        self.student_info = list()
+        self.student_info = dict()
 
         self.national_code = input('Student National Code: ')
-        if self.__check_duplicate(self.national_code, 3):
+        if self.__check_duplicate(self.national_code, 'national_code'):
             system(clear_command)
             return 'This National Code Already Exists.\n'
         
         self.student_number = input('Student Number: ')
         
-        if self.__check_duplicate(self.student_number, 4):
+        if self.__check_duplicate(self.student_number, 'student_number'):
             system(clear_command)
             return 'This Student Number Already Exists.\n'
 
@@ -55,19 +98,21 @@ class StudentManager:
 
         # Appending information to List.
 
-        self.student_info.append(self.first_name)
-        self.student_info.append(self.last_name)
-        self.student_info.append(self.gender)
-        self.student_info.append(self.national_code)
-        self.student_info.append(self.student_number)
-        self.student_info.append(self.birth_date)
-        self.student_info.append(self.csharp_score)
-        self.student_info.append(self.python_score)
-        self.student_info.append(self.java_score)
-        self.student_info.append(self.java_script_score)
-        self.student_info.append(self.php_score)
+        self.student_info['first_name'] = self.first_name
+        self.student_info['last_name'] = self.last_name
+        self.student_info['gender'] = self.gender
+        self.student_info['national_code'] = self.national_code
+        self.student_info['student_number'] = self.student_number
+        self.student_info['birth_date'] = self.birth_date
+        self.student_info['csharp_score'] = self.csharp_score
+        self.student_info['python_score'] = self.python_score
+        self.student_info['java_score'] = self.java_score
+        self.student_info['java_script_score'] = self.java_script_score
+        self.student_info['php_score'] = self.php_score
 
         self.list_of_students.append(self.student_info)
+        create_record(self.student_info)
+
         system(clear_command)
         return f'{self.first_name} Saved.\n'
     
@@ -86,7 +131,7 @@ class StudentManager:
         return self.__printer(self.list_of_students)
 
 
-    def __check_duplicate(self, id_, index):
+    def __check_duplicate(self, id_, key_):
         """
         Check if Value is Duplicate.
 
@@ -94,7 +139,7 @@ class StudentManager:
         """
 
         for element in self.list_of_students:
-            if element[index] == id_:
+            if element[key_] == id_:
                 return True
             
     def __printer(self, value: List, nested: bool = True) -> str:
@@ -111,13 +156,13 @@ class StudentManager:
         if nested:
             print('***********************************************************************************************')
             for record in value:
-                print(*record, sep='\t')
+                print(record, sep='\t')
             print('***********************************************************************************************')
             return f'{len(value)} records found\n'  
                   
         else:
             print('***********************************************************************************************')
-            print(*value, sep='\t')
+            print(value, sep='\t')
             print('***********************************************************************************************')
             return f'\n'
 
@@ -139,23 +184,23 @@ class StudentManager:
             for element in self.list_of_students:
 
 
-                if element[3] == id_:
+                if element['national_code'] == id_:
                     system('clear')
-                    edit_choices = input('What Do you want to edit about this Student:\n1-First Name\n2-Last Name\n3-Gender\n4-National Code\n5-Student Number\n6-Birthdate\n7-C# Score\n8-Python Score\n9-Java Score\n10-JS Score\n11-PHP Score:\n\nWhich one: ')
+                    edit_choices = input('What Do you want to edit about this Student:\n1-First Name\n2-Last Name\n3-Gender\n4-National Code\n5-Student Number\n6-Birthdate\n7-C# Score\n8-Python Score\n9-Java Score\n10-JS Score\n11-PHP Score\n12-Exit\n\nWhich one: ')
 
                     if edit_choices == '1':
-                        element[0] = input('Enter New First Name: ')
+                        element['first_name'] = input('Enter New First Name: ')
                         system(clear_command)
                         return 'First Name Changed.\n'
 
                     elif edit_choices == '2':
-                        element[1] = input('Enter New Last Name: ')
+                        element['last_name'] = input('Enter New Last Name: ')
                         system(clear_command)
                         return 'Last Name Changed.\n'
 
                     elif edit_choices == '3':
                         system(clear_command)
-                        element[2] = input('Enter New Gender: ')
+                        element['gender'] = input('Enter New Gender: ')
                         system(clear_command)
                         return 'Gender Changed.\n'
 
@@ -164,56 +209,60 @@ class StudentManager:
                         new_national_code = input('Enter New National Code: ')
                         system(clear_command)
 
-                        if self.__check_duplicate(new_national_code, 3):
+                        if self.__check_duplicate(new_national_code, 'national_code'):
                             return 'National Code Already Exists.\n'
                         
-                        element[3] = new_national_code
+                        element['national_code'] = new_national_code
                         system(clear_command)
                         return 'National Code Changed.\n'
                     
                     elif edit_choices == '5':
                         new_student_number = input('Enter New Student Number: ')
 
-                        if self.__check_duplicate(new_student_number, 4):
+                        if self.__check_duplicate(new_student_number, 'student_number'):
                             return 'Student Number Already Exists.\n'
                         
-                        element[4] = new_student_number
+                        element['student_number'] = new_student_number
                         system(clear_command)
                         return 'National Code Changed.\n'
                     
                     elif edit_choices == '6':
-                        element[5] = input('Enter New BirthDate: ')
+                        element['birth_date'] = input('Enter New BirthDate: ')
                         system(clear_command)
                         return 'BirthDate Changed.\n'
                     
                     elif edit_choices == '7':
-                        element[6] = input('Enter New C# Score: ')
+                        element['csharp_score'] = input('Enter New C# Score: ')
                         system(clear_command)
                         return 'C# Score Changed.\n'
 
                     elif edit_choices == '8':
-                        element[7] = input('Enter New Python Score: ')
+                        element['python_score'] = input('Enter New Python Score: ')
                         system(clear_command)
                         return 'Python Score Changed.\n'
 
                     elif edit_choices == '9':
-                        element[8] = input('Enter New Java Score: ')
+                        element['java_score'] = input('Enter New Java Score: ')
                         system(clear_command)
                         return 'Java Score Changed.\n'
 
                     elif edit_choices == '10':
-                        element[9] = input('Enter New Java Script Score: ')
+                        element['java_script_score'] = input('Enter New Java Script Score: ')
                         system(clear_command)
                         return 'Java Script Score Changed.\n'
 
                     elif edit_choices == '11':
-                        element[10] = input('Enter New PHP Score: ')
+                        element['php_score'] = input('Enter New PHP Score: ')
                         system(clear_command)
                         return 'PHP Score Changed.\n'
                     
+                    elif edit_choices == '12':
+                        system(clear_command)
+                        return 'You Did not Change AnyThing.\n'
+                    
                     else:
                         system(clear_command)
-                        return 'You Must Choose an option between (1-11)!\n'
+                        return 'You Must Choose an option between (1-12)!\n'
                 
             else:
                 return f'National Code Does Not Exists: {id_}\n'
@@ -226,20 +275,21 @@ class StudentManager:
                 
                 if element[4] == id_:
                     system(clear_command)
-                    edit_choices = input('What Do you want to edit about this Student:\n1-First Name\n2-Last Name\n3-Gender\n4-National Code\n5-Student Number\n6-Birthdate\n7-C# Score\n8-Python Score\n9-Java Score\n10-JS Score\n11-PHP Score:\n12-Exit\n\n')
+                    edit_choices = input('What Do you want to edit about this Student:\n1-First Name\n2-Last Name\n3-Gender\n4-National Code\n5-Student Number\n6-Birthdate\n7-C# Score\n8-Python Score\n9-Java Score\n10-JS Score\n11-PHP Score:\n12-Exit\n\nWhich One: ')
 
                     if edit_choices == '1':
-                        element[0] = input('Enter New First Name: ')
+                        element['first_name'] = input('Enter New First Name: ')
                         system(clear_command)
                         return 'First Name Changed.\n'
 
                     elif edit_choices == '2':
-                        element[1] = input('Enter New Last Name: ')
+                        element['last_name'] = input('Enter New Last Name: ')
                         system(clear_command)
                         return 'Last Name Changed.\n'
 
                     elif edit_choices == '3':
-                        element[2] = input('Enter New Gender: ')
+                        system(clear_command)
+                        element['gender'] = input('Enter New Gender: ')
                         system(clear_command)
                         return 'Gender Changed.\n'
 
@@ -248,51 +298,50 @@ class StudentManager:
                         new_national_code = input('Enter New National Code: ')
                         system(clear_command)
 
-                        if self._check_duplicate(new_national_code, 3):
+                        if self.__check_duplicate(new_national_code, 'national_code'):
                             return 'National Code Already Exists.\n'
                         
-                        element[3] = new_national_code
+                        element['national_code'] = new_national_code
                         system(clear_command)
                         return 'National Code Changed.\n'
                     
                     elif edit_choices == '5':
-                        system(clear_command)
                         new_student_number = input('Enter New Student Number: ')
 
-                        if self._check_duplicate(new_student_number, 4):
+                        if self.__check_duplicate(new_student_number, 'student_number'):
                             return 'Student Number Already Exists.\n'
                         
-                        element[4] = new_student_number
+                        element['student_number'] = new_student_number
                         system(clear_command)
                         return 'National Code Changed.\n'
-
+                    
                     elif edit_choices == '6':
-                        element[5] = input('Enter New BirthDate: ')
+                        element['birth_date'] = input('Enter New BirthDate: ')
                         system(clear_command)
                         return 'BirthDate Changed.\n'
                     
                     elif edit_choices == '7':
-                        element[6] = input('Enter New C# Score: ')
+                        element['csharp_score'] = input('Enter New C# Score: ')
                         system(clear_command)
                         return 'C# Score Changed.\n'
 
                     elif edit_choices == '8':
-                        element[7] = input('Enter New Python Score: ')
+                        element['python_score'] = input('Enter New Python Score: ')
                         system(clear_command)
                         return 'Python Score Changed.\n'
 
                     elif edit_choices == '9':
-                        element[8] = input('Enter New Java Score: ')
+                        element['java_score'] = input('Enter New Java Score: ')
                         system(clear_command)
                         return 'Java Score Changed.\n'
 
                     elif edit_choices == '10':
-                        element[9] = input('Enter New Java Script Score: ')
+                        element['java_script_score'] = input('Enter New Java Script Score: ')
                         system(clear_command)
                         return 'Java Script Score Changed.\n'
 
                     elif edit_choices == '11':
-                        element[10] = input('Enter New PHP Score: ')
+                        element['php_score'] = input('Enter New PHP Score: ')
                         system(clear_command)
                         return 'PHP Score Changed.\n'
                     
@@ -327,10 +376,10 @@ class StudentManager:
         if edit_by == '1':
 
             for index, element in enumerate(self.list_of_students):
-                if element[3] == id_:
+                if element['national_code'] == id_:
                     removed_data = self.list_of_students.pop(index)
                     system(clear_command)
-                    return f'{removed_data[0]} Removed Successfully.\n'
+                    return f'{removed_data["first_name"]} Removed Successfully.\n'
                 
                 else:
                     system(clear_command)
@@ -342,10 +391,10 @@ class StudentManager:
         elif edit_by == '2':
 
             for index, element in enumerate(self.list_of_students):
-                if element[4] == id_:
+                if element['student_number'] == id_:
                     removed_data = self.list_of_students.pop(index)
                     system(clear_command)
-                    return f'{removed_data[0]} Removed Successfully.\n'
+                    return f'{removed_data["first_name"]} Removed Successfully.\n'
                 
                 else:
                     system(clear_command)
@@ -374,9 +423,10 @@ class StudentManager:
         if search_option == '1':
 
             filtered_list = list()
+
             if len(self.list_of_students) >= 1:
                 for name in self.list_of_students:
-                    if name[0] == student_id:
+                    if name['first_name'] == student_id:
                         filtered_list.append(name)
                     continue
 
@@ -384,14 +434,14 @@ class StudentManager:
             
             return 'First Add Student!\n'
 
-        if search_option == '2':
+        elif search_option == '2':
 
             filtered_list = list()
 
             if len(self.list_of_students) >= 1:
 
                 for name in self.list_of_students:
-                    if name[1] == student_id:
+                    if name['last_name'] == student_id:
                         filtered_list.append(name)
                     continue
 
@@ -399,13 +449,13 @@ class StudentManager:
             
             return 'First add Student!\n'
 
-        if search_option == '3':
+        elif search_option == '3':
 
             filtered_list = list()
 
             if len(self.list_of_students) >= 1:
                 for name in self.list_of_students:
-                    if name[2] == student_id:
+                    if name['gender'] == student_id:
                         filtered_list.append(name)
                     continue
 
@@ -413,13 +463,13 @@ class StudentManager:
             
             return 'First add Student!\n'
 
-        if search_option == '4':
+        elif search_option == '4':
 
             filtered_list = list()
 
             if len(self.list_of_students) >= 1:
                 for name in self.list_of_students:
-                    if name[3] == student_id:
+                    if name['national_code'] == student_id:
                         filtered_list.append(name)
                     continue
 
@@ -427,19 +477,20 @@ class StudentManager:
             
             return 'First add student!\n'
 
-        if search_option == '5':
+        elif search_option == '5':
 
             filtered_list = list()
 
             if len(self.list_of_students) >= 1:
                 for name in self.list_of_students:
-                    if name[4] == student_id:
+                    if name['student_number'] == student_id:
                         filtered_list.append(name)
                     continue
 
                 return self.__printer(filtered_list)
             
             return 'First add student!\n'
+        
 
     def best_student(self, course: str):
         """
@@ -457,11 +508,11 @@ class StudentManager:
             if len(self.list_of_students) >= 1:
                 for student in self.list_of_students:
 
-                    if float(student[6]) > highest_score:
-                        highest_score = float(student[6])
+                    if float(student['csharp_score']) > highest_score:
+                        highest_score = float(student['csharp_score'])
                         sharpest_student = student
                     continue
-                print(f'{sharpest_student[0]} get highest Score in C#')
+                print(f'{sharpest_student["first_name"]} get highest Score in C#')
                 return self.__printer(sharpest_student, nested=False)
 
             return 'You have to add student first!\n'
@@ -471,12 +522,12 @@ class StudentManager:
             highest_score = 1.0
             if len(self.list_of_students) >= 1:
                 for student in self.list_of_students:
-                    if float(student[7]) > highest_score:
-                        highest_score = float(student[7])
+                    if float(student['python_score']) > highest_score:
+                        highest_score = float(student['python_score'])
                         sharpest_student = student
                     continue
 
-                print(f'{sharpest_student[0]} get highest Score in Python')
+                print(f'{sharpest_student["first_name"]} get highest Score in Python')
                 return self.__printer(sharpest_student, nested=False)
             
             return 'You have to add student first!\n'
@@ -486,27 +537,43 @@ class StudentManager:
             highest_score = 1.0
             if len(self.list_of_students) >= 1:
                 for student in self.list_of_students:
-                    if float(student[8]) > highest_score:
-                        highest_score = float(student[8])
+                    if float(student['java_score']) > highest_score:
+                        highest_score = float(student['java_score'])
                         sharpest_student = student
                     continue
             
-                print(f'{sharpest_student[0]} get highest Score in Java')
+                print(f'{sharpest_student["first_name"]} get highest Score in Java')
                 return self.__printer(sharpest_student, nested=False)
             
             return 'You have to add student first!\n'
 
-        if course == '3':
+        if course == '4':
             highest_score = 1.0
             for student in self.list_of_students:
-                if float(student[8]) > highest_score:
-                    highest_score = float(student[8])
+                if float(student['java_script_score']) > highest_score:
+                    highest_score = float(student['java_script_score'])
                     sharpest_student = student
                 continue
 
             if len(self.list_of_students) >= 1:
 
-                print(f'{sharpest_student[0]} get highest Score in Java')
+                print(f'{sharpest_student["first_name"]} get highest Score in JavaScript')
+                return self.__printer(sharpest_student, nested=False)
+
+            return 'You have to add student first!\n'
+
+    
+        if course == '5':
+            highest_score = 1.0
+            for student in self.list_of_students:
+                if float(student['php_score']) > highest_score:
+                    highest_score = float(student['php_score'])
+                    sharpest_student = student
+                continue
+
+            if len(self.list_of_students) >= 1:
+
+                print(f'{sharpest_student["first_name"]} get highest Score in JavaScript')
                 return self.__printer(sharpest_student, nested=False)
     
             return 'You have to add Students First\n'
@@ -606,19 +673,28 @@ if __name__ == '__main__':
                     print('++ Filter by Student Number ++')
                     student_id = input('Enter Student Number: ')
                     break
-
+                
                 elif search_option == '6':
-                    print('Exit.')
-                    student_id = input('Enter Student Last Name: ')
+                    system(clear_command)
+                    print('Exit')
+                    print()
                     break
+
+                else:
+                    system(clear_command)
+                    print('Choose a number between (1-6)')
+                    print()
             
-            print(student_manager.search_student(search_option, student_id))
+            if search_option != '6':
+                print(student_manager.search_student(search_option, student_id))
+            else:
+                continue
 
         elif options == '6':
             
             system(clear_command)
             while True:
-                filter_by = input('Find Best Student By:\n1-C# Score\n2-Python Score\n3-Java Score\n\nWhich one: ')
+                filter_by = input('Find Best Student By:\n1-C# Score\n2-Python Score\n3-Java Score\n4-JavaScirpt Score\n5-PHP Score\n\nWhich one: ')
 
                 if filter_by == '1':
                     print('Finding best student by C# Score')
@@ -631,6 +707,19 @@ if __name__ == '__main__':
                 elif filter_by == '3':
                     print('Finding best student by Java Score')
                     break
+
+                elif filter_by == '4':
+                    print('Finding best student by JavaScript Score')
+                    break
+
+                elif filter_by == '5':
+                    print('Finding best student by PHP Score')
+                    break
+
+                else:
+                    system(clear_command)
+                    print('You Have To Choose Between (1-5)!')
+                    print()
             
             print(student_manager.best_student(filter_by))
 
