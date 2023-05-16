@@ -1,7 +1,9 @@
+import os
 from os import system
 import mysql.connector
 from typing import List
 from os import name as osname
+import mysql.connector.errors
 
 
 if osname == 'posix':
@@ -13,14 +15,11 @@ db = mysql.connector.connect(
 
     host="localhost",
     user="root",
-    password="Linken.m0s",
+    password=os.environ['DB_PASS'],
     database="student"
     )
 
 def create_record(student_info):
-
-
-    cursor = db.cursor()
 
     sql = """INSERT INTO Students (
     ID, FirstName, LastName, NationalCode,
@@ -45,11 +44,11 @@ def create_record(student_info):
         )
     ]
 
+    cursor = db.cursor()
     cursor.executemany(sql, val)
     db.commit()
 
-    return f'{cursor.rowcount}, "was inserted."'
-
+    # return f'{cursor.rowcount}, "was inserted."'
 
 
 class StudentManager:
@@ -75,15 +74,15 @@ class StudentManager:
         self.student_info = dict()
 
         self.national_code = input('Student National Code: ')
-        if self.__check_duplicate(self.national_code, 'national_code'):
-            system(clear_command)
-            return 'This National Code Already Exists.\n'
+        # if self.__check_duplicate(self.national_code, 'national_code'):
+        #     system(clear_command)
+        #     return 'This National Code Already Exists.\n'
         
         self.student_number = input('Student Number: ')
         
-        if self.__check_duplicate(self.student_number, 'student_number'):
-            system(clear_command)
-            return 'This Student Number Already Exists.\n'
+        # if self.__check_duplicate(self.student_number, 'student_number'):
+        #     system(clear_command)
+        #     return 'This Student Number Already Exists.\n'
 
         self.first_name = input('Student First Name: ')
         self.last_name = input('Student Last Name: ')
@@ -111,9 +110,11 @@ class StudentManager:
         self.student_info['php_score'] = self.php_score
 
         self.list_of_students.append(self.student_info)
-        create_record(self.student_info)
 
         system(clear_command)
+
+        create_record(self.student_info)
+        
         return f'{self.first_name} Saved.\n'
     
 
