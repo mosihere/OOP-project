@@ -4,6 +4,7 @@ import mysql.connector
 from typing import List
 from os import name as osname
 import mysql.connector.errors
+from typing import Callable
 
 
 if osname == 'posix':
@@ -19,34 +20,7 @@ db = mysql.connector.connect(
     database="student"
     )
 
-def create_record(student_info):
 
-    sql = """INSERT INTO Students (
-    ID, FirstName, LastName, NationalCode,
-    BirthDate, Gender, Python, Csharp,
-    Js, Php, Java
-    )
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    val = [
-        (
-        student_info['student_number'],
-        student_info['first_name'],
-        student_info['last_name'],
-        student_info['national_code'],
-        student_info['birth_date'],
-        student_info['gender'],
-        student_info['python_score'],
-        student_info['csharp_score'],
-        student_info['java_script_score'],
-        student_info['java_score'],
-        student_info['php_score'],
-        )
-    ]
-
-    cursor = db.cursor()
-    cursor.executemany(sql, val)
-    db.commit()
 
     # return f'{cursor.rowcount}, "was inserted."'
 
@@ -62,6 +36,64 @@ class StudentManager:
         self.list_of_students = list()
     
 
+    def create_record(self, student_info: dict) -> None:
+        """
+        Commit a Record in Database
+
+        Args:
+            student_info: Dict
+
+        Returns:
+            None
+        """
+
+        sql = """INSERT INTO Students (
+        ID, FirstName, LastName, NationalCode,
+        BirthDate, Gender, Python, Csharp,
+        Js, Php, Java
+        )
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        val = [
+            (
+            student_info['student_number'],
+            student_info['first_name'],
+            student_info['last_name'],
+            student_info['national_code'],
+            student_info['birth_date'],
+            student_info['gender'],
+            student_info['python_score'],
+            student_info['csharp_score'],
+            student_info['java_script_score'],
+            student_info['java_score'],
+            student_info['php_score'],
+            )
+        ]
+
+        cursor = db.cursor()
+        cursor.executemany(sql, val)
+        db.commit()
+
+        return None
+
+
+    def read_record(self) -> Callable:
+        """
+        Reading Data From Database.
+
+        Returns:
+            __printer method
+        """
+
+        sql = "SELECT * FROM Students;"
+        
+        cursor = db.cursor()
+        cursor.execute(sql)
+        students = cursor.fetchall()
+
+        return self.__printer(students)
+
+
     def add_student(self):
         """
         populate student infromation
@@ -74,16 +106,7 @@ class StudentManager:
         self.student_info = dict()
 
         self.national_code = input('Student National Code: ')
-        # if self.__check_duplicate(self.national_code, 'national_code'):
-        #     system(clear_command)
-        #     return 'This National Code Already Exists.\n'
-        
         self.student_number = input('Student Number: ')
-        
-        # if self.__check_duplicate(self.student_number, 'student_number'):
-        #     system(clear_command)
-        #     return 'This Student Number Already Exists.\n'
-
         self.first_name = input('Student First Name: ')
         self.last_name = input('Student Last Name: ')
         self.gender = input('Student Gender(m/f): ')
@@ -113,7 +136,7 @@ class StudentManager:
 
         system(clear_command)
 
-        create_record(self.student_info)
+        self.create_record(self.student_info)
         
         return f'{self.first_name} Saved.\n'
     
@@ -129,7 +152,7 @@ class StudentManager:
         system(clear_command)
         print('List of Students:')
 
-        return self.__printer(self.list_of_students)
+        return self.read_record()
 
 
     def __check_duplicate(self, id_, key_):
