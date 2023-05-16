@@ -94,6 +94,28 @@ class StudentManager:
         return self.__printer(students)
 
 
+    def update_record(self, column_name: str, new_value: str, id_: int) -> None:
+        """
+        Update a Record In DataBase.
+
+        Args:
+            column_name: Name of Column to update.
+            new_value: New value to update with.
+            id_: ID of Student/Student Number.
+        
+        Returns:
+            None
+        """
+
+        sql = f'UPDATE Students SET {column_name} = %s WHERE ID = %s'
+        cursor = db.cursor()
+        values = (new_value, id_)
+        cursor.execute(sql, values)
+        db.commit()
+        system(clear_command)
+        return 'Record Updated Succesfully.\n'
+
+
     def add_student(self):
         """
         populate student infromation
@@ -155,16 +177,16 @@ class StudentManager:
         return self.read_record()
 
 
-    def __check_duplicate(self, id_, key_):
-        """
-        Check if Value is Duplicate.
+    # def __check_duplicate(self, id_, key_):
+    #     """
+    #     Check if Value is Duplicate.
 
-        Return: Bool
-        """
+    #     Return: Bool
+    #     """
 
-        for element in self.list_of_students:
-            if element[key_] == id_:
-                return True
+    #     for element in self.list_of_students:
+    #         if element[key_] == id_:
+    #             return True
             
     def __printer(self, value: List, nested: bool = True) -> str:
         """
@@ -191,7 +213,7 @@ class StudentManager:
             return f'\n'
 
 
-    def edit_student(self, edit_by: str, id_: str) -> str:
+    def edit_student(self, id_: int, edited_column: str) -> None:
         """
         This method takes edit_by and id_ as argument
         then edit the specific part.
@@ -200,190 +222,56 @@ class StudentManager:
             edit_by: str (User Chosen Method)
             id_: str (Could be National Code / Student Number)
 
-        Return: Str
+        Return: None
         """
 
-        system(clear_command)
-        if edit_by == '1':
-            for element in self.list_of_students:
+        if edited_column == '1':
+            value = 'FirstName'
+            new_value = input('Enter New First Name: ')
+        
+        elif edited_column == '2':
+            value = 'LastName'
+            new_value = input('Enter New Last Name: ')
+
+        elif edited_column == '3':
+            value = 'ID'
+            new_value = input('Enter New Student Number: ')
+        
+        elif edited_column == '4':
+            value = 'NationalCode'
+            new_value = input('Enter New National Code: ')
+
+        elif edited_column == '5':
+            value = 'Gender'
+            new_value = input('Enter New Gender: ')
+        
+        elif edited_column == '6':
+            value = 'BirthDate'
+            new_value = input('Enter New BirthDate --> Format -> 1998-08-12: ')
+        
+        elif edited_column == '7':
+            value = 'Python'
+            new_value = input('Enter New Python Score: ')
+        
+        elif edited_column == '8':
+            value = 'Java'
+            new_value = input('Enter New Java Score: ')
+        
+        elif edited_column == '9':
+            value = 'Js'
+            new_value = input('Enter New Js Score: ')
+        
+        elif edited_column == '10':
+            new_value = input('Enter New Php Score: ')
+            value = 'Php'
+        
+        elif edited_column == '11':
+            new_value = input('Enter New Csharp: ')
+            value = 'Csharp'
 
 
-                if element['national_code'] == id_:
-                    system('clear')
-                    edit_choices = input('What Do you want to edit about this Student:\n1-First Name\n2-Last Name\n3-Gender\n4-National Code\n5-Student Number\n6-Birthdate\n7-C# Score\n8-Python Score\n9-Java Score\n10-JS Score\n11-PHP Score\n12-Exit\n\nWhich one: ')
+        return self.update_record(value, new_value, id_)
 
-                    if edit_choices == '1':
-                        element['first_name'] = input('Enter New First Name: ')
-                        system(clear_command)
-                        return 'First Name Changed.\n'
-
-                    elif edit_choices == '2':
-                        element['last_name'] = input('Enter New Last Name: ')
-                        system(clear_command)
-                        return 'Last Name Changed.\n'
-
-                    elif edit_choices == '3':
-                        system(clear_command)
-                        element['gender'] = input('Enter New Gender: ')
-                        system(clear_command)
-                        return 'Gender Changed.\n'
-
-                    elif edit_choices == '4':
-                        system(clear_command)
-                        new_national_code = input('Enter New National Code: ')
-                        system(clear_command)
-
-                        if self.__check_duplicate(new_national_code, 'national_code'):
-                            return 'National Code Already Exists.\n'
-                        
-                        element['national_code'] = new_national_code
-                        system(clear_command)
-                        return 'National Code Changed.\n'
-                    
-                    elif edit_choices == '5':
-                        new_student_number = input('Enter New Student Number: ')
-
-                        if self.__check_duplicate(new_student_number, 'student_number'):
-                            return 'Student Number Already Exists.\n'
-                        
-                        element['student_number'] = new_student_number
-                        system(clear_command)
-                        return 'National Code Changed.\n'
-                    
-                    elif edit_choices == '6':
-                        element['birth_date'] = input('Enter New BirthDate: ')
-                        system(clear_command)
-                        return 'BirthDate Changed.\n'
-                    
-                    elif edit_choices == '7':
-                        element['csharp_score'] = input('Enter New C# Score: ')
-                        system(clear_command)
-                        return 'C# Score Changed.\n'
-
-                    elif edit_choices == '8':
-                        element['python_score'] = input('Enter New Python Score: ')
-                        system(clear_command)
-                        return 'Python Score Changed.\n'
-
-                    elif edit_choices == '9':
-                        element['java_score'] = input('Enter New Java Score: ')
-                        system(clear_command)
-                        return 'Java Score Changed.\n'
-
-                    elif edit_choices == '10':
-                        element['java_script_score'] = input('Enter New Java Script Score: ')
-                        system(clear_command)
-                        return 'Java Script Score Changed.\n'
-
-                    elif edit_choices == '11':
-                        element['php_score'] = input('Enter New PHP Score: ')
-                        system(clear_command)
-                        return 'PHP Score Changed.\n'
-                    
-                    elif edit_choices == '12':
-                        system(clear_command)
-                        return 'You Did not Change AnyThing.\n'
-                    
-                    else:
-                        system(clear_command)
-                        return 'You Must Choose an option between (1-12)!\n'
-                
-            else:
-                return f'National Code Does Not Exists: {id_}\n'
-
-
-        elif edit_by == '2':
-            system(clear_command)
-
-            for element in self.list_of_students:
-                
-                if element[4] == id_:
-                    system(clear_command)
-                    edit_choices = input('What Do you want to edit about this Student:\n1-First Name\n2-Last Name\n3-Gender\n4-National Code\n5-Student Number\n6-Birthdate\n7-C# Score\n8-Python Score\n9-Java Score\n10-JS Score\n11-PHP Score:\n12-Exit\n\nWhich One: ')
-
-                    if edit_choices == '1':
-                        element['first_name'] = input('Enter New First Name: ')
-                        system(clear_command)
-                        return 'First Name Changed.\n'
-
-                    elif edit_choices == '2':
-                        element['last_name'] = input('Enter New Last Name: ')
-                        system(clear_command)
-                        return 'Last Name Changed.\n'
-
-                    elif edit_choices == '3':
-                        system(clear_command)
-                        element['gender'] = input('Enter New Gender: ')
-                        system(clear_command)
-                        return 'Gender Changed.\n'
-
-                    elif edit_choices == '4':
-                        system(clear_command)
-                        new_national_code = input('Enter New National Code: ')
-                        system(clear_command)
-
-                        if self.__check_duplicate(new_national_code, 'national_code'):
-                            return 'National Code Already Exists.\n'
-                        
-                        element['national_code'] = new_national_code
-                        system(clear_command)
-                        return 'National Code Changed.\n'
-                    
-                    elif edit_choices == '5':
-                        new_student_number = input('Enter New Student Number: ')
-
-                        if self.__check_duplicate(new_student_number, 'student_number'):
-                            return 'Student Number Already Exists.\n'
-                        
-                        element['student_number'] = new_student_number
-                        system(clear_command)
-                        return 'National Code Changed.\n'
-                    
-                    elif edit_choices == '6':
-                        element['birth_date'] = input('Enter New BirthDate: ')
-                        system(clear_command)
-                        return 'BirthDate Changed.\n'
-                    
-                    elif edit_choices == '7':
-                        element['csharp_score'] = input('Enter New C# Score: ')
-                        system(clear_command)
-                        return 'C# Score Changed.\n'
-
-                    elif edit_choices == '8':
-                        element['python_score'] = input('Enter New Python Score: ')
-                        system(clear_command)
-                        return 'Python Score Changed.\n'
-
-                    elif edit_choices == '9':
-                        element['java_score'] = input('Enter New Java Score: ')
-                        system(clear_command)
-                        return 'Java Score Changed.\n'
-
-                    elif edit_choices == '10':
-                        element['java_script_score'] = input('Enter New Java Script Score: ')
-                        system(clear_command)
-                        return 'Java Script Score Changed.\n'
-
-                    elif edit_choices == '11':
-                        element['php_score'] = input('Enter New PHP Score: ')
-                        system(clear_command)
-                        return 'PHP Score Changed.\n'
-                    
-                    elif edit_choices == '12':
-                        system(clear_command)
-                        return 'You Did not Change AnyThing.\n'
-                    
-                    else:
-                        system(clear_command)
-                        return 'You Must Choose an option between (1-12)!\n'
-                    
-            else:
-                return f'Student Number Does Not Exists: {id_}\n'
-
-                    
-        else:
-            system(clear_command)
-            return 'Wrong Option, You have to Choose a Number between (1-2)!\n'
                     
             
     def remove_student(self, edit_by: str, id_: str):
@@ -622,30 +510,11 @@ if __name__ == '__main__':
 
             system(clear_command)
 
-            while True:
-                while True:
-                    edit_option = input('Select Student By:\n1-NationalCode\n2-StudentNumber\n\nWhich one: ')
+            student_id = int(input('Student Number: '))
+            edited_attribute = input('What Do you Want to Update:\n1-First Name\n2-Last Name\n3-Student Number\n4-National Code\n5-Gender\n6-Birth Date\n7-Python Score\n8-Java Score\n9-Js Score\n10-Php Score\n11-C# Score\n\nWhich One: ')
 
-                    if edit_option == '1':
-                        student_id = input('Enter Student National Code: ')
-                        break 
-
-                    elif edit_option == '2':
-                        student_id = input('Enter Student Number: ')
-                        break
-
-                    else:
-                        system('clear')
-                        print('Wrong Option, You have to Choose a Number between (1-2)!\n')
-
-                print(student_manager.edit_student(edit_option, student_id))
-                ask_for_continue_editing = input('Wanna Continue Editing?\n(Yes/No): ')
-                print()
-                if ask_for_continue_editing.lower() == 'no':
-                    system('clear')
-                    break
-
-                system('clear')
+            system('clear')
+            print(student_manager.edit_student(student_id, edited_attribute))
 
 
         elif options == '4':
