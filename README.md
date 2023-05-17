@@ -17,13 +17,13 @@ Each Records will save in MySQL.
 #### Adding Student
 
 <div align="center" >
-<img loading="lazy" style="width:700px" src="./images/StartUp.png">
+<img loading="lazy" style="width:350" src="./images/StartUp.png">
 </div>
 
 #### Student Saved
 
 <div align="center" >
-<img loading="lazy" style="width:700px" src="./images/Saved.png">
+<img loading="lazy" style="width:350" src="./images/Saved.png">
 </div>
 
 #### MySQL Update
