@@ -14,19 +14,19 @@ Each Records will save in MySQL.
 - Find Students Based on First Name, Last Name, Gender ...
 
 
-# Adding Student
+#### Adding Student
 
 <div align="center" >
 <img loading="lazy" style="width:700px" src="./images/StartUp.png">
 </div>
 
-# Student Saved
+#### Student Saved
 
 <div align="center" >
 <img loading="lazy" style="width:700px" src="./images/Saved.png">
 </div>
 
-# MySQL Update
+#### MySQL Update
 
 <div align="center" >
 <img loading="lazy" style="width:700px" src="./images/MySQL.png">
