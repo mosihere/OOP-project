@@ -12,6 +12,7 @@ if osname == 'posix':
 else:
     clear_command = 'cls'
 
+
 db = mysql.connector.connect(
 
     host="localhost",
@@ -19,11 +20,6 @@ db = mysql.connector.connect(
     password=os.environ['DB_PASS'],
     database="student"
     )
-
-
-
-    # return f'{cursor.rowcount}, "was inserted."'
-
 
 class StudentManager:
     """
@@ -116,6 +112,37 @@ class StudentManager:
         return 'Record Updated Succesfully.\n'
 
 
+    def delete_record(self, id_: int) -> None:
+        """
+        This method will find student by id
+        and delete information of that student.
+
+        Args:
+            id_: Student Number
+        
+        Returns:
+            None
+        """
+
+        cursor = db.cursor()
+        sql = 'SELECT ID FROM Students WHERE ID=%s'
+        value = (id_, )
+
+        try:
+            cursor.execute(sql, value)
+            result = cursor.fetchone()
+            if result:
+                sql = 'DELETE FROM Students WHERE ID=%s'
+                cursor.execute(sql, value)
+                db.commit()
+                return 'Student Deleted Succesfully.\n'
+            else:
+                return 'No Student Found!\n'
+        
+        except mysql.connector.Error as err:
+            return f'Something went Wrong!{err}\n'
+                    
+
     def add_student(self):
         """
         populate student infromation
@@ -177,17 +204,6 @@ class StudentManager:
         return self.read_record()
 
 
-    # def __check_duplicate(self, id_, key_):
-    #     """
-    #     Check if Value is Duplicate.
-
-    #     Return: Bool
-    #     """
-
-    #     for element in self.list_of_students:
-    #         if element[key_] == id_:
-    #             return True
-            
     def __printer(self, value: List, nested: bool = True) -> str:
         """
         Takes a list as argument and unpack and pretify values.
@@ -271,52 +287,20 @@ class StudentManager:
 
 
         return self.update_record(value, new_value, id_)
-
-                    
+    
             
-    def remove_student(self, edit_by: str, id_: str):
+    def remove_student(self, id_: int):
         """
         Check if this student exists
         if True, Then remove the student.
 
         Args:
-            edit_by: str (User Chosen Method Number)
-            id_: str (Could be National Code / Student Number)
+            id_: int Student Number
         """
 
         system(clear_command)
-        if edit_by == '1':
 
-            for index, element in enumerate(self.list_of_students):
-                if element['national_code'] == id_:
-                    removed_data = self.list_of_students.pop(index)
-                    system(clear_command)
-                    return f'{removed_data["first_name"]} Removed Successfully.\n'
-                
-                else:
-                    system(clear_command)
-                    return f'There is no records with this National code.\n'
-            system('clear')
-            return f'There is no records with this National code.\n'
-                
-
-        elif edit_by == '2':
-
-            for index, element in enumerate(self.list_of_students):
-                if element['student_number'] == id_:
-                    removed_data = self.list_of_students.pop(index)
-                    system(clear_command)
-                    return f'{removed_data["first_name"]} Removed Successfully.\n'
-                
-                else:
-                    system(clear_command)
-                    return f'There is no records with this Student Number.\n'
-            system('clear')
-            return f'There is no records with this Student Number.\n'
-                  
-        else:
-            system(clear_command)
-            return 'Wrong Option, you have to Choose between (1-2)!\n'
+        return self.delete_record(id_)
 
 
     def search_student(self, search_option: str, student_id: str):
@@ -520,21 +504,10 @@ if __name__ == '__main__':
         elif options == '4':
 
             system(clear_command)
-            while True:
-                edit_option = input('Remove Student By:\n1-National Code\n2-Student Number\n\nWhich One: ')
+            student_id = int(input('Enter Student Number: '))
 
-                if edit_option == '1':
-                    student_id = input('Enter Student National Code: ')
-                    break
+            print(student_manager.remove_student(student_id))
 
-                elif edit_option == '2':
-                    student_id = input('Enter Student Number: ')
-                    break
-
-                else:
-                    print('Wrong Option, You have to Choose a Number between (1-2)!')
-
-            print(student_manager.remove_student(edit_option, student_id))
 
         elif options == '5':
 
