@@ -67,13 +67,18 @@ class StudentManager:
         ]
 
         cursor = db.cursor()
-        cursor.executemany(sql, val)
-        db.commit()
 
-        return None
+        try:
+            cursor.executemany(sql, val)
+            db.commit()
+
+            return None
+        
+        except mysql.connector.Error as err:
+            return f'Something went Wrong!{err}\n'
 
 
-    def read_record(self) -> Callable:
+    def read_record(self, query: str = None) -> Callable:
         """
         Reading Data From Database.
 
@@ -81,13 +86,20 @@ class StudentManager:
             __printer method
         """
 
-        sql = "SELECT * FROM Students;"
-        
-        cursor = db.cursor()
-        cursor.execute(sql)
-        students = cursor.fetchall()
+        if query:
+            sql = query
 
-        return self.__printer(students)
+        else:
+            sql = "SELECT * FROM Students;"
+        
+        try:
+            cursor = db.cursor()
+            cursor.execute(sql)
+            students = cursor.fetchall()
+            return self.__printer(students)
+        
+        except mysql.connector.Error as err:
+            return f'Something went Wrong!{err}\n'
 
 
     def update_record(self, column_name: str, new_value: str, id_: int) -> None:
@@ -104,12 +116,17 @@ class StudentManager:
         """
 
         sql = f'UPDATE Students SET {column_name} = %s WHERE ID = %s'
-        cursor = db.cursor()
         values = (new_value, id_)
-        cursor.execute(sql, values)
-        db.commit()
-        system(clear_command)
-        return 'Record Updated Succesfully.\n'
+        cursor = db.cursor()
+
+        try:
+            cursor.execute(sql, values)
+            db.commit()
+            system(clear_command)
+            return 'Record Updated Succesfully.\n'
+        
+        except mysql.connector.Error as err:
+            return f'Something went Wrong!{err}\n'
 
 
     def delete_record(self, id_: int) -> None:
@@ -317,76 +334,24 @@ class StudentManager:
         system(clear_command)
 
         if search_option == '1':
-
-            filtered_list = list()
-
-            if len(self.list_of_students) >= 1:
-                for name in self.list_of_students:
-                    if name['first_name'] == student_id:
-                        filtered_list.append(name)
-                    continue
-
-                return self.__printer(filtered_list)
-            
-            return 'First Add Student!\n'
+            value = 'FirstName'
 
         elif search_option == '2':
-
-            filtered_list = list()
-
-            if len(self.list_of_students) >= 1:
-
-                for name in self.list_of_students:
-                    if name['last_name'] == student_id:
-                        filtered_list.append(name)
-                    continue
-
-                return self.__printer(filtered_list)
-            
-            return 'First add Student!\n'
-
+            value = 'LastName'
+      
         elif search_option == '3':
-
-            filtered_list = list()
-
-            if len(self.list_of_students) >= 1:
-                for name in self.list_of_students:
-                    if name['gender'] == student_id:
-                        filtered_list.append(name)
-                    continue
-
-                return self.__printer(filtered_list)
-            
-            return 'First add Student!\n'
+            value = 'Gender'
 
         elif search_option == '4':
-
-            filtered_list = list()
-
-            if len(self.list_of_students) >= 1:
-                for name in self.list_of_students:
-                    if name['national_code'] == student_id:
-                        filtered_list.append(name)
-                    continue
-
-                return self.__printer(filtered_list)
-            
-            return 'First add student!\n'
-
+            value = 'NationalCode'
+     
         elif search_option == '5':
-
-            filtered_list = list()
-
-            if len(self.list_of_students) >= 1:
-                for name in self.list_of_students:
-                    if name['student_number'] == student_id:
-                        filtered_list.append(name)
-                    continue
-
-                return self.__printer(filtered_list)
-            
-            return 'First add student!\n'
+            value = 'ID'
         
+        sql_query = f'SELECT * FROM Students WHERE {value} = "{student_id}"'
+
+        return self.read_record(sql_query)
+         
 
     def best_student(self, course: str):
         """
@@ -399,80 +364,22 @@ class StudentManager:
         system(clear_command)
 
         if course == '1':
-            highest_score = 1.0
+            value = 'Csharp'
 
-            if len(self.list_of_students) >= 1:
-                for student in self.list_of_students:
+        elif course == '2':
+            value = 'Python'
 
-                    if float(student['csharp_score']) > highest_score:
-                        highest_score = float(student['csharp_score'])
-                        sharpest_student = student
-                    continue
-                print(f'{sharpest_student["first_name"]} get highest Score in C#')
-                return self.__printer(sharpest_student, nested=False)
+        elif course == '3':
+            value = 'Java'
 
-            return 'You have to add student first!\n'
+        elif course == '4':
+            value = 'Js'
 
+        elif course == '5':
+            value = 'Php'
 
-        if course == '2':
-            highest_score = 1.0
-            if len(self.list_of_students) >= 1:
-                for student in self.list_of_students:
-                    if float(student['python_score']) > highest_score:
-                        highest_score = float(student['python_score'])
-                        sharpest_student = student
-                    continue
-
-                print(f'{sharpest_student["first_name"]} get highest Score in Python')
-                return self.__printer(sharpest_student, nested=False)
-            
-            return 'You have to add student first!\n'
-
-
-        if course == '3':
-            highest_score = 1.0
-            if len(self.list_of_students) >= 1:
-                for student in self.list_of_students:
-                    if float(student['java_score']) > highest_score:
-                        highest_score = float(student['java_score'])
-                        sharpest_student = student
-                    continue
-            
-                print(f'{sharpest_student["first_name"]} get highest Score in Java')
-                return self.__printer(sharpest_student, nested=False)
-            
-            return 'You have to add student first!\n'
-
-        if course == '4':
-            highest_score = 1.0
-            for student in self.list_of_students:
-                if float(student['java_script_score']) > highest_score:
-                    highest_score = float(student['java_script_score'])
-                    sharpest_student = student
-                continue
-
-            if len(self.list_of_students) >= 1:
-
-                print(f'{sharpest_student["first_name"]} get highest Score in JavaScript')
-                return self.__printer(sharpest_student, nested=False)
-
-            return 'You have to add student first!\n'
-
-    
-        if course == '5':
-            highest_score = 1.0
-            for student in self.list_of_students:
-                if float(student['php_score']) > highest_score:
-                    highest_score = float(student['php_score'])
-                    sharpest_student = student
-                continue
-
-            if len(self.list_of_students) >= 1:
-
-                print(f'{sharpest_student["first_name"]} get highest Score in JavaScript')
-                return self.__printer(sharpest_student, nested=False)
-    
-            return 'You have to add Students First\n'
+        sql_query = f"""SELECT MAX({value}) FROM Students"""
+        return self.read_record(sql_query)
 
 
 if __name__ == '__main__':
@@ -495,7 +402,8 @@ if __name__ == '__main__':
             system(clear_command)
 
             student_id = int(input('Student Number: '))
-            edited_attribute = input('What Do you Want to Update:\n1-First Name\n2-Last Name\n3-Student Number\n4-National Code\n5-Gender\n6-Birth Date\n7-Python Score\n8-Java Score\n9-Js Score\n10-Php Score\n11-C# Score\n\nWhich One: ')
+            print()
+            edited_attribute = input('What Do you Want to Update:\n\n1-First Name\n2-Last Name\n3-Student Number\n4-National Code\n5-Gender\n6-Birth Date\n7-Python Score\n8-Java Score\n9-Js Score\n10-Php Score\n11-C# Score\n\nWhich One: ')
 
             system('clear')
             print(student_manager.edit_student(student_id, edited_attribute))
@@ -537,7 +445,7 @@ if __name__ == '__main__':
 
                 elif search_option == '5':
                     print('++ Filter by Student Number ++')
-                    student_id = input('Enter Student Number: ')
+                    student_id = int(input('Enter Student Number/ID: '))
                     break
                 
                 elif search_option == '6':
