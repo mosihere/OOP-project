@@ -102,7 +102,7 @@ class StudentManager:
             return f'Something went Wrong!{err}\n'
 
 
-    def update_record(self, column_name: str, new_value: str, id_: int) -> None:
+    def update_record(self, column_name: str, new_value: str, id_: int) -> str:
         """
         Update a Record In DataBase.
 
@@ -112,7 +112,7 @@ class StudentManager:
             id_: ID of Student/Student Number.
         
         Returns:
-            None
+            str (status of execution)
         """
 
         sql = f'UPDATE Students SET {column_name} = %s WHERE ID = %s'
@@ -129,7 +129,7 @@ class StudentManager:
             return f'Something went Wrong!{err}\n'
 
 
-    def delete_record(self, id_: int) -> None:
+    def delete_record(self, id_: int) -> str:
         """
         This method will find student by id
         and delete information of that student.
@@ -138,7 +138,7 @@ class StudentManager:
             id_: Student Number
         
         Returns:
-            None
+            str (status of execution)
         """
 
         cursor = db.cursor()
@@ -207,12 +207,12 @@ class StudentManager:
         return f'{self.first_name} Saved.\n'
     
 
-    def show_student(self):
+    def show_student(self) -> Callable:
         """
         Print Students information.
 
         Return:
-            Str: List of Students
+            Str: read_record method.
         """
 
         system(clear_command)
@@ -246,7 +246,7 @@ class StudentManager:
             return f'\n'
 
 
-    def edit_student(self, id_: int, edited_column: str) -> None:
+    def edit_student(self, id_: int, edited_column: str) -> Callable:
         """
         This method takes edit_by and id_ as argument
         then edit the specific part.
@@ -255,7 +255,7 @@ class StudentManager:
             edit_by: str (User Chosen Method)
             id_: str (Could be National Code / Student Number)
 
-        Return: None
+        Return: update_record method
         """
 
         if edited_column == '1':
@@ -306,13 +306,15 @@ class StudentManager:
         return self.update_record(value, new_value, id_)
     
             
-    def remove_student(self, id_: int):
+    def remove_student(self, id_: int) -> Callable:
         """
         Check if this student exists
         if True, Then remove the student.
 
         Args:
             id_: int Student Number
+        
+        Returns: delete_record method.
         """
 
         system(clear_command)
@@ -320,15 +322,15 @@ class StudentManager:
         return self.delete_record(id_)
 
 
-    def search_student(self, search_option: str, student_id: str):
+    def search_student(self, search_option: str, student_id: str) -> Callable:
         """
-        Searching Student Based on Chosen Methdo and id.
+        Searching Student Based on Chosen Method and id.
 
         Args:
             search_option: str (User chosen Method)
             student_id: str (Could be First_name, Last_name, National_code ...)
 
-        Return: Str
+        Return: read_record method.
         """
 
         system(clear_command)
@@ -353,12 +355,15 @@ class StudentManager:
         return self.read_record(sql_query)
          
 
-    def best_student(self, course: str):
+    def best_student(self, course: str) -> Callable:
         """
         Find Best Student Based on Score in specific Course.
         
         Args:
             course: str
+
+        Returns:
+            read_record method.
         """
 
         system(clear_command)
