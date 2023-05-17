@@ -176,7 +176,7 @@ class StudentManager:
         self.first_name = input('Student First Name: ')
         self.last_name = input('Student Last Name: ')
         self.gender = input('Student Gender(m/f): ')
-        self.birth_date = input('Student Birthdate: ')
+        self.birth_date = input('Student Birthdate (1990-10-10): ')
         self.csharp_score = input('Student C# Score: ')
         self.python_score = input('Student Python Score: ')
         self.java_score = input('Student Java Score: ')
