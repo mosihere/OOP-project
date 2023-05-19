@@ -258,52 +258,42 @@ class StudentManager:
         Return: update_record method
         """
 
-        if edited_column == '1':
-            value = 'FirstName'
-            new_value = input('Enter New First Name: ')
-        
-        elif edited_column == '2':
-            value = 'LastName'
-            new_value = input('Enter New Last Name: ')
+        value_translate = {
+            '1': 'FirstName',
+            '2': 'LastName',
+            '3': 'ID',
+            '4': 'NationalCode',
+            '5': 'Gender',
+            '6': 'BirthDate',
+            '7': 'Python',
+            '8': 'Java',
+            '9': 'Js',
+            '10': 'Php',
+            '11': 'Csharp'
+        }
 
-        elif edited_column == '3':
-            value = 'ID'
-            new_value = input('Enter New Student Number: ')
+        if edited_column not in value_translate:
+            system(clear_command)
+            return 'You Must enter a Number Between 1-11!\n'
         
-        elif edited_column == '4':
-            value = 'NationalCode'
-            new_value = input('Enter New National Code: ')
+        value = value_translate[edited_column]
+        system(clear_command)
+        new_value = input(f'Enter New {value}: ')
 
-        elif edited_column == '5':
-            value = 'Gender'
-            new_value = input('Enter New Gender: ')
-        
-        elif edited_column == '6':
-            value = 'BirthDate'
-            new_value = input('Enter New BirthDate --> Format -> 1998-08-12: ')
-        
-        elif edited_column == '7':
-            value = 'Python'
-            new_value = input('Enter New Python Score: ')
-        
-        elif edited_column == '8':
-            value = 'Java'
-            new_value = input('Enter New Java Score: ')
-        
-        elif edited_column == '9':
-            value = 'Js'
-            new_value = input('Enter New Js Score: ')
-        
-        elif edited_column == '10':
-            new_value = input('Enter New Php Score: ')
-            value = 'Php'
-        
-        elif edited_column == '11':
-            new_value = input('Enter New Csharp: ')
-            value = 'Csharp'
+        try:
+            student_exists_query = f'SELECT ID from Students WHERE ID = {id_}'
+            cursor = db.cursor()
+            cursor.execute(student_exists_query)
+            data = cursor.fetchone()
 
+            if data:
 
-        return self.update_record(value, new_value, id_)
+                return self.update_record(value, new_value, id_)
+            else:
+                return 'No Students Found!\n'
+            
+        except mysql.connector.Error as err:
+            return f'SomeThing Went Wrong!, {err}'
     
             
     def remove_student(self, id_: int) -> Callable:
@@ -335,21 +325,18 @@ class StudentManager:
 
         system(clear_command)
 
-        if search_option == '1':
-            value = 'FirstName'
-
-        elif search_option == '2':
-            value = 'LastName'
-      
-        elif search_option == '3':
-            value = 'Gender'
-
-        elif search_option == '4':
-            value = 'NationalCode'
-     
-        elif search_option == '5':
-            value = 'ID'
+        value_translate = {
+            '1': 'FirstName',
+            '2': 'LastName',
+            '3': 'Gender',
+            '4': 'NationalCode',
+            '5': 'ID'
+            }
         
+        if search_option not in value_translate:
+            return 'You Must enter a Number Between 1-5!\n'
+        
+        value = value_translate[search_option]
         sql_query = f'SELECT * FROM Students WHERE {value} = "{student_id}"'
 
         return self.read_record(sql_query)
@@ -368,21 +355,18 @@ class StudentManager:
 
         system(clear_command)
 
-        if course == '1':
-            value = 'Csharp'
+        value_translate = {
+            '1': 'Csharp',
+            '2': 'Python',
+            '3': 'Java',
+            '4': 'Js',
+            '5': 'Php'
+        }
 
-        elif course == '2':
-            value = 'Python'
+        if course not in value_translate:
+            return 'You Must enter a Number Between 1-5!\n'
 
-        elif course == '3':
-            value = 'Java'
-
-        elif course == '4':
-            value = 'Js'
-
-        elif course == '5':
-            value = 'Php'
-
+        value = value_translate[course]
         sql_query = f"""SELECT MAX({value}) FROM Students"""
         return self.read_record(sql_query)
 
@@ -399,8 +383,10 @@ if __name__ == '__main__':
             system(clear_command)
             print(student_manager.add_student())
 
+
         elif options == '2':
             print(student_manager.show_student())
+
 
         elif options == '3':
 
@@ -408,10 +394,22 @@ if __name__ == '__main__':
 
             student_id = int(input('Student Number: '))
             print()
-            edited_attribute = input('What Do you Want to Update:\n\n1-First Name\n2-Last Name\n3-Student Number\n4-National Code\n5-Gender\n6-Birth Date\n7-Python Score\n8-Java Score\n9-Js Score\n10-Php Score\n11-C# Score\n\nWhich One: ')
 
-            system('clear')
-            print(student_manager.edit_student(student_id, edited_attribute))
+            student_exists_query = f'SELECT ID from Students WHERE ID = {student_id}'
+            cursor = db.cursor()
+
+            cursor.execute(student_exists_query)
+            data = cursor.fetchone()
+            
+            if not data:
+                system(clear_command)
+                print('No Students Found!\n')
+
+            else:
+                system(clear_command)
+                edited_attribute = input('What Do you Want to Update:\n\n1-First Name\n2-Last Name\n3-Student Number\n4-National Code\n5-Gender\n6-Birth Date\n7-Python Score\n8-Java Score\n9-Js Score\n10-Php Score\n11-C# Score\n\nWhich One: ')
+
+                print(student_manager.edit_student(student_id, edited_attribute))
 
 
         elif options == '4':
@@ -426,81 +424,54 @@ if __name__ == '__main__':
 
             system(clear_command)
             while True:
-                search_option = input('Search Student By:\n1-First name:\n2-Last Name\n3-Gender\n4-National Code\n5-Student Number\n6-Exit\n\nWhich One: ')
-
-                if search_option == '1':
-                    print('++ Filter by First Name ++')
-                    student_id = input('Enter Student First Name: ')
-                    break
-
-                elif search_option == '2':
-                    print('++ Filter by Last Name ++')
-                    student_id = input('Enter Student Last Name: ')
-                    break
-
-                elif search_option == '3':
-                    print('++ Filter by Gender ++')
-                    student_id = input('Enter Gender (m/f): ')
-                    break
-
-                elif search_option == '4':
-                    print('++ Filter by National Code ++')
-                    student_id = input('Enter Student National Code: ')
-                    break
-
-                elif search_option == '5':
-                    print('++ Filter by Student Number ++')
-                    student_id = int(input('Enter Student Number/ID: '))
-                    break
+                search_option = input('Search Student By:\n\n1-First name:\n2-Last Name\n3-Gender\n4-National Code\n5-Student Number\n6-Exit\n\nWhich One: ')
                 
-                elif search_option == '6':
+                if search_option == '6':
                     system(clear_command)
                     print('Exit')
                     print()
                     break
 
-                else:
+                value_translate = {
+                    '1': 'FirstName',
+                    '2': 'LastName',
+                    '3': 'Gender',
+                    '4': 'NationalCode',
+                    '5': 'ID',
+                    }
+                
+                if search_option not in value_translate:
                     system(clear_command)
-                    print('Choose a number between (1-6)')
-                    print()
-            
-            if search_option != '6':
+                    print('You Have To Enter a Number Between 1-6!')
+                    break
+                
+                student_id = input(f'Enter Student {value_translate[search_option]}:')
+                print(f'++ Filter by {value_translate[search_option]} ++')
+                print()
                 print(student_manager.search_student(search_option, student_id))
-            else:
-                continue
+                break
 
         elif options == '6':
             
             system(clear_command)
             while True:
-                filter_by = input('Find Best Student By:\n1-C# Score\n2-Python Score\n3-Java Score\n4-JavaScirpt Score\n5-PHP Score\n\nWhich one: ')
+                filter_by = input('Find Best Student By:\n\n1-C# Score\n2-Python Score\n3-Java Score\n4-JavaScirpt Score\n5-PHP Score\n\nWhich one: ')
 
-                if filter_by == '1':
-                    print('Finding best student by C# Score')
-                    break
+                value_translate = {
+                    '1': 'Csharp',
+                    '2': 'Python',
+                    '3': 'Java',
+                    '4': 'Js',
+                    '5': 'Php'
+                }
 
-                elif filter_by == '2':
-                    print('Finding best student by Python Score')
-                    break
-
-                elif filter_by == '3':
-                    print('Finding best student by Java Score')
-                    break
-
-                elif filter_by == '4':
-                    print('Finding best student by JavaScript Score')
-                    break
-
-                elif filter_by == '5':
-                    print('Finding best student by PHP Score')
-                    break
-
-                else:
+                if filter_by not in value_translate:
                     system(clear_command)
                     print('You Have To Choose Between (1-5)!')
                     print()
             
-            print(student_manager.best_student(filter_by))
+                print(student_manager.best_student(filter_by))
+                break
 
         elif options == '7':
 
