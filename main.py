@@ -29,8 +29,6 @@ class StudentManager:
     def __init__(self) -> None:
         pass
     
-        self.list_of_students = list()
-    
 
     def create_record(self, student_info: dict) -> None:
         """
@@ -42,6 +40,8 @@ class StudentManager:
         Returns:
             None
         """
+
+        err_list = list()
 
         sql = """INSERT INTO Students (
         ID, FirstName, LastName, NationalCode,
@@ -66,16 +66,24 @@ class StudentManager:
             )
         ]
 
+        for key, value in student_info.items():
+            if value:
+                if key in ['php_score', 'csharp_score', 'python_score', 'java_script_score', 'java_score'] and type(value) != int:
+                    err_list.append(f'- {key} must be float/integer!')
+            elif not value:
+                err_list.append(f'- {key} field is empty!')
+            else:
+                continue
+
         cursor = db.cursor()
 
         try:
             cursor.executemany(sql, val)
             db.commit()
-
-            return None
-        
-        except mysql.connector.Error as err:
-            return f'Something went Wrong!{err}\n'
+            return True, 'Done'
+                
+        except mysql.connector.Error:
+            return False, '\n'.join(err_list)
 
 
     def read_record(self, query: str = None) -> Callable:
@@ -184,7 +192,7 @@ class StudentManager:
         self.php_score = input('Student PHP Score: ')
 
 
-        # Appending information to List.
+        # adding information to Dictionary.
 
         self.student_info['first_name'] = self.first_name
         self.student_info['last_name'] = self.last_name
@@ -198,13 +206,15 @@ class StudentManager:
         self.student_info['java_script_score'] = self.java_script_score
         self.student_info['php_score'] = self.php_score
 
-        self.list_of_students.append(self.student_info)
-
         system(clear_command)
 
-        self.create_record(self.student_info)
+        result = self.create_record(self.student_info)
+        if result[0]:
         
-        return f'{self.first_name} Saved.\n'
+            return f'{self.first_name} Saved.\n'
+        
+        else:
+            return f'Failed Because:\n{result[1]}\n'
     
 
     def show_student(self) -> Callable:
