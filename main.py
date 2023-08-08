@@ -2,9 +2,12 @@ import os
 from os import system
 import mysql.connector
 from typing import List
-from os import name as osname
-import mysql.connector.errors
 from typing import Callable
+from os import name as osname
+from tabulate import tabulate
+import mysql.connector.errors
+
+
 
 
 if osname == 'posix':
@@ -231,29 +234,20 @@ class StudentManager:
         return self.read_record()
 
 
-    def __printer(self, value: List, nested: bool = True) -> str:
+    def __printer(self, value: List) -> str:
         """
         Takes a list as argument and unpack and pretify values.
 
         Args:
             value: List
-            nested: Bool
         
         Return: Str
         """
 
-        if nested:
-            print('***********************************************************************************************')
-            for record in value:
-                print(record, sep='\t')
-            print('***********************************************************************************************')
-            return f'{len(value)} records found\n'  
-                  
-        else:
-            print('***********************************************************************************************')
-            print(value, sep='\t')
-            print('***********************************************************************************************')
-            return f'\n'
+        title = ['ID', 'First Name', 'Last Name', 'National Code', 'Birth Date', 'Gender', 'Python Score', 'C# Score', 'JavaScript Score', 'PHP Score', 'Java Score']
+        table = tabulate(value, headers=title, tablefmt='psql')
+
+        return f'{table}\n'
 
 
     def edit_student(self, id_: int, edited_column: str) -> Callable:
