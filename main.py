@@ -6,7 +6,7 @@ from typing import Callable
 from os import name as osname
 from tabulate import tabulate
 import mysql.connector.errors
-
+from package.dal import create_record, read_record, delete_record, update_record
 
 
 
@@ -31,145 +31,7 @@ class StudentManager:
 
     def __init__(self) -> None:
         pass
-    
-
-    def create_record(self, student_info: dict) -> None:
-        """
-        Commit a Record in Database
-
-        Args:
-            student_info: Dict
-
-        Returns:
-            None
-        """
-
-        err_list = list()
-
-        sql = """INSERT INTO Students (
-        ID, FirstName, LastName, NationalCode,
-        BirthDate, Gender, Python, Csharp,
-        Js, Php, Java
-        )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """
-        val = [
-            (
-            student_info['student_number'],
-            student_info['first_name'],
-            student_info['last_name'],
-            student_info['national_code'],
-            student_info['birth_date'],
-            student_info['gender'],
-            student_info['python_score'],
-            student_info['csharp_score'],
-            student_info['java_script_score'],
-            student_info['java_score'],
-            student_info['php_score'],
-            )
-        ]
-
-        for key, value in student_info.items():
-            if value:
-                if key in ['php_score', 'csharp_score', 'python_score', 'java_script_score', 'java_score'] and type(value) != int:
-                    err_list.append(f'- {key} must be float/integer!')
-            elif not value:
-                err_list.append(f'- {key} field is empty!')
-            else:
-                continue
-
-        cursor = db.cursor()
-
-        try:
-            cursor.executemany(sql, val)
-            db.commit()
-            return True, 'Done'
-                
-        except mysql.connector.Error:
-            return False, '\n'.join(err_list)
-
-
-    def read_record(self, query: str = None) -> Callable:
-        """
-        Reading Data From Database.
-
-        Returns:
-            __printer method
-        """
-
-        if query:
-            sql = query
-
-        else:
-            sql = "SELECT * FROM Students;"
         
-        try:
-            cursor = db.cursor()
-            cursor.execute(sql)
-            students = cursor.fetchall()
-            return self.__printer(students)
-        
-        except mysql.connector.Error as err:
-            return f'Something went Wrong!{err}\n'
-
-
-    def update_record(self, column_name: str, new_value: str, id_: int) -> str:
-        """
-        Update a Record In DataBase.
-
-        Args:
-            column_name: Name of Column to update.
-            new_value: New value to update with.
-            id_: ID of Student/Student Number.
-        
-        Returns:
-            str (status of execution)
-        """
-
-        sql = f'UPDATE Students SET {column_name} = %s WHERE ID = %s'
-        values = (new_value, id_)
-        cursor = db.cursor()
-
-        try:
-            cursor.execute(sql, values)
-            db.commit()
-            system(clear_command)
-            return 'Record Updated Succesfully.\n'
-        
-        except mysql.connector.Error as err:
-            return f'Something went Wrong!{err}\n'
-
-
-    def delete_record(self, id_: int) -> str:
-        """
-        This method will find student by id
-        and delete information of that student.
-
-        Args:
-            id_: Student Number
-        
-        Returns:
-            str (status of execution)
-        """
-
-        cursor = db.cursor()
-        sql = 'SELECT ID FROM Students WHERE ID=%s'
-        value = (id_, )
-
-        try:
-            cursor.execute(sql, value)
-            result = cursor.fetchone()
-            if result:
-                sql = 'DELETE FROM Students WHERE ID=%s'
-                cursor.execute(sql, value)
-                db.commit()
-                return 'Student Deleted Succesfully.\n'
-            else:
-                return 'No Student Found!\n'
-        
-        except mysql.connector.Error as err:
-            return f'Something went Wrong!{err}\n'
-                    
 
     def add_student(self):
         """
@@ -211,13 +73,13 @@ class StudentManager:
 
         system(clear_command)
 
-        result = self.create_record(self.student_info)
-        if result[0]:
+        result = create_record(self.student_info, db)
+        if result[1] == 'Done':
         
             return f'{self.first_name} Saved.\n'
         
         else:
-            return f'Failed Because:\n{result[1]}\n'
+            return f'Failed Because:\n{result[0]}\n'
     
 
     def show_student(self) -> Callable:
@@ -231,7 +93,10 @@ class StudentManager:
         system(clear_command)
         print('List of Students:')
 
-        return self.read_record()
+
+        students = read_record(db)
+        if students:
+            return self.__printer(students)
 
 
     def __printer(self, value: List) -> str:
@@ -292,7 +157,7 @@ class StudentManager:
 
             if data:
 
-                return self.update_record(value, new_value, id_)
+                return update_record(value, new_value, id_, db)
             else:
                 return 'No Students Found!\n'
             
@@ -313,7 +178,7 @@ class StudentManager:
 
         system(clear_command)
 
-        return self.delete_record(id_)
+        return delete_record(id_, db)
 
 
     def search_student(self, search_option: str, student_id: str) -> Callable:
@@ -343,7 +208,10 @@ class StudentManager:
         value = value_translate[search_option]
         sql_query = f'SELECT * FROM Students WHERE {value} = "{student_id}"'
 
-        return self.read_record(sql_query)
+        result = read_record(db, sql_query)
+
+        if result:
+            return self.__printer(result)
          
 
     def best_student(self, course: str) -> Callable:
@@ -372,7 +240,11 @@ class StudentManager:
 
         value = value_translate[course]
         sql_query = f"""SELECT MAX({value}) FROM Students"""
-        return self.read_record(sql_query)
+
+        result = read_record(db, sql_query)
+
+        if result:
+            return self.__printer(result)
 
 
 if __name__ == '__main__':
